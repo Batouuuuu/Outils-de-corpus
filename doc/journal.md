@@ -54,6 +54,7 @@ Il n'y a pas de mentions légales sur le site pour ce qui est du scrapping donc 
 Dans le dataset que j'ai choisi beaucoup d'informations sont indiquées, il y a notamment une colonne label qui identifie si la question a été posé par un humain où par un LLM style chatgpt. Je vais essayer de simuler ça en regardant s'il n'existe pas une bibliothèque python qui détécte si quelque chose a été écrit par chagpt.
 Mon corpus est constitué de 55 (questions-réponses issues du forum) et 10 question (issues du forum) et 10 réponses de chatgpt.
 Deja sans chercher d'outils pour détecter chatgpt, on remarque que les réponses de chatgpt ont toutes les même format. Elles sont très longues et très méthodique. Elles consistent en une enumération de différentes actions à faire pour résoudre le problème, suivie d'une phrase de conclusion qui résume les actions à effectuer du style (j'espere que ces idées seront utiles, en résumé...).
+
 --------------------------
 
 ## Code
