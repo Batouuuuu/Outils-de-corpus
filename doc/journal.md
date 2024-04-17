@@ -83,3 +83,24 @@ En revanche quand la question est sur la même page. Il faut identifier un carr�
 ### Ecriture des résultats
 Tous mes résultats seront écrit dans un tsv qui aura la même forme que mon dataset.
 Egalement afin de rendre cela exploitable j'ai crée une dataclass qui permet de réutiliser ces données si un utilisateur souhaite compléter ou repprendre ce travail.
+
+
+ 
+-------------
+## Semaine 4
+
+### Récupération de la question 
+
+Très simple, il a fallu reccueilir les différentes pages du forum bricolage. Tout le contenu de chaque page est contenu dans une liste. Ensuite on a plus qu'a parcourir cette liste qui contient les différentes balises des pages et de réccupérer la question à chaque fois.
+
+### Récuppération de la meilleure réponse ?
+
+Plus compliqué,  probleme pour trouver la meilleure réponse. J'ai réalisé que finalement la balise post_resume n'est pas identique. J'ai remarqué que ce qui différenciait la meilleure réponse des autres était un petit intitulé "VOus consulté le sujet : blabla..." qui indique que c'est la meilleure réponse. J'ai essayé plusieurs façon pour le cibler, les re, ou les méthodes intégrées finding_siblings() de BeautifulSoup, mais rien n'y fait. Il s'avère qu'après avoir redirigé le contenu du scraper beautiful soup je me suis rendu compte que jamais "Vous consultez le sujet :" apparaissait. Cela est surement dû au fait que n'est pas dans le HTML brut de la page, cette information peut être ajoutée dynamiquement avec Javascript. Dans ce cas il faut me tourner vers un scraper plus puissant comme Selenium par exemple. Selenium a vite été abandonné car il fallait télécharger un driver et cela n'a pas fonctionné. 
+
+Autre piste : regarder le nombre de likes (- C'est cette piste qui sera gardée) 
+Il y'a 2 possibilités soit la meilleure réponse se trouve sur la page, soit elle se trouve sur une page différente du forum. 
+Pour prendre en compte ces 2 cas lorsqu'il y'a une meilleure réponse dans la page il y'a un encadré gris indiquant allé à la meilleure réponse (elle contient un lien). La technique est donc de récuppérer se lien de l'extraire et d'ensuite parcourir cette page avec beautifulsoup pour récupérer la réponse avec le plus de like.
+
+Limite de cette technique = Si un commentaire à le même nombre de like que la meilleure réponse alors c'est la première occurence du commentaire qui sera gardée. 
+
+Nouveau probleme je n'ai pas le même nombre de liens 54 liens au total sur la page et après recherche des meilleures réponses 26: Je viens de découvrir que certains sujet ne contenait pas de "meilleure réponse" il va donc falloir les exclure
