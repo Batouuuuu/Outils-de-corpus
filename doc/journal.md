@@ -103,4 +103,51 @@ Pour prendre en compte ces 2 cas lorsqu'il y'a une meilleure réponse dans la pa
 
 Limite de cette technique = Si un commentaire à le même nombre de like que la meilleure réponse alors c'est la première occurence du commentaire qui sera gardée. 
 
-Nouveau probleme je n'ai pas le même nombre de liens 54 liens au total sur la page et après recherche des meilleures réponses 26: Je viens de découvrir que certains sujet ne contenait pas de "meilleure réponse" il va donc falloir les exclure
+Nouveau probleme je n'ai pas le même nombre de liens 54 liens au total sur la page et après recherche des meilleures réponses 26: Je viens de découvrir que certains sujet ne contenait pas de "meilleure réponse" il va donc falloir les exclure.
+Pour ce faire j'ai mis au point une nouvelle méthode d'extraction des questions du forum.
+
+### Nouvelle approche pour extraire les questions
+
+Il va falloir récupérer les urls des questions dans lesquelles ont retrouve l'intitulé "cliquez pour accéder à la meilleure réponse" (qui contient l'url vers la meilleure réponse).
+Pour ce faire j'ai gardé ma fonction qui extraiyait tous les liens des questions mais cette fois ci je parcours la liste dans laquelle ils sont stockés, j'ouvre chaque lien et s'ils ont cet intitulé de réponse alors je les ajoute à une nouvelle liste.
+
+TOUT MARCHE SUPER !!!!
+
+Il me reste un problème certaines questions du forum sont en fait des vidéos (donc en fait l'utilisateur poste une question qui est en fait une réponse en elle-même.) Il faut donc les retirer
+
+
+Remplissage de la dataclass, comme je n'ai fait en sorte d'avoir que des listes j'utilise la méthode zip pour toutes les zipper entre elles, et je parcours à chaque fois et je remplis ma dataclass.
+
+Création d'une nouvelle dataclass plutot que de faire une liste de qui contient la dataclass à chaque fois, j'ai fait une dataclass qui est directement la liste de l'ancienne dataclass
+
+-----
+### Récupération des questions et des réponses de chatgpt 
+
+Maintenant 
+
+-----
+
+### Stockage des données
+
+Les données sont stockées dans des fichiers csv
+
+### Modifications des données du dataset : 
+comme je n'ai pas très bien cerné ce qu'était le bucket, jai aussi fait le choix de retirer la colonne domaine, inutile puisque je suis toujours sur la même domaine (forum bricolage), pour la remplacer par le sujet de la question que j'ai jugé plus pertinent. 
+Il a donc fallu récupérer le sujet/titre de chaque question.
+
+-----
+### Résumé complet du travail 
+
+
+
+
+-----------
+### Limites de mon approche/ choses à améliorer 
+
+- Récupération de la meilleure réponse : L'algorithme ne récuppère pas toujours la bonne réponse mais récuppère la 1ere question qui a le plus de like. Seulement, si 2 questions ont le même nombre de like cela gardera la 1ere même si celle là n'est pas la réponse la plus pertinente.
+
+- La signature de certains commentaires : je n'ai pas réussi à ne pas la prendre en compte
+
+- L'id d'identification des réponse : pas convaincu que cela soit réelement utile avec ma méthode
+
+- L'utilisation répétitive de listes : à chaque fois mes données sont stockées dans des listes et je ne suis pas certains que ce soit la meilleure chose. Certaines choses auraient pû être optimiser afin d'éviter les redites et le stockage constant dans des listes.
