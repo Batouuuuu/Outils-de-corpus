@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from typing import List
 
 @dataclass
 class Page:
@@ -7,8 +8,12 @@ class Page:
     id_question : int
     id_reponse : int
     #bucket : ?
-    domaine : str
+    sujet : str ## anciennement domaine a été remplacé pour le sujet de la question (les raisons sont expliquées dans le journal)
     question : str
     reponse : str
-    #etiquette : str
+    etiquette : str
+
+@dataclass
+class Dataset:
+    data : List[Page]
 

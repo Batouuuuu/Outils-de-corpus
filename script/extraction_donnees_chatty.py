@@ -1,0 +1,1 @@
+"""Ce script récuppère une dizaine de questions et de réponses générées sur chatgpt 3.5"""
