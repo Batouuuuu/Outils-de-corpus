@@ -1,14 +1,25 @@
-""" (je préviens, script long a exécuté) Ce script va permettre de constituer un tsv qui nous permettra d'entrainer notre classifieur SVM. Il s'agit de la seule alternative
+""" (je préviens, script long a exécuté) Ce script va permettre de constituer un fichier tsv qui nous permettra d'entrainer notre classifieur SVM. Il s'agit de la seule alternative
 que j'ai trouvé pour juger de la pertinence d'une réponse. Nous allons parcourir plusieurs pages du blog et récuppérer des 
 questions et des réponses aléatoires puis nous récupérerons des questions et les bonnes réponses, ainsi nous auront la pertinence
 OUI ou NON qui nous permettra de créer notre classification binaire utile pour le SVM """
 
 import random
 from extractions_des_donnees_forum import *
-from datastructures import * 
+from datastructures import Liste_Reponses_SVM, Reponse_SVM 
 
 def recuperation_reponse_aleatoire(liste_reponses: List[str]) -> List[str]:
-    """Récupère plusieurs réponses au hasard parmi la liste de réponses fournies."""
+    """
+    Récupère plusieurs réponses au hasard parmi la liste de réponses fournies.
+    
+    Cette fonction sélectionne aléatoirement des réponses de la liste fournie et
+    renvoie une liste de réponses uniques. 
+
+    Parametres:
+    liste_reponses (List[str]): La liste des réponses parmi lesquelles choisir.
+
+    Returns                                                                                                 :
+    List[str]: Une liste de réponses uniques choisies aléatoirement.
+    """
     
     reponses_aleatoires = set()
 
@@ -22,7 +33,19 @@ def recuperation_reponse_aleatoire(liste_reponses: List[str]) -> List[str]:
 
 
 def ecriture_resultats(dataset_fichier : str | Path, data : Liste_Reponses_SVM) -> None:
-    """Cette fonction écrit nos résultat dans un fichier TSV"""
+    """
+    Écrit les résultats dans un fichier TSV.
+    
+    Cette fonction prend un chemin de fichier et un objet contenant des données de réponses,
+    puis écrit ces données dans un fichier TSV avec les colonnes 'Pertinence', 'Question' et 'Réponse'.
+    
+    Parametres:
+    dataset_fichier (str | Path) : Le chemin du fichier où les résultats seront écrits.
+    data (Liste_Reponses_SVM): Un objet contenant les données des réponses à écrire dans le fichier.
+    
+    Returns:
+    None
+    """
 
     with open(dataset_fichier, "w", newline='', encoding='UTF-8') as resultats_tsv:
         ecriture = csv.writer(resultats_tsv, delimiter="\t")
@@ -71,7 +94,7 @@ def main():
             )
             liste.append(extraction)
         
-        # ## même principe mais cette fois c'est avec les bonnes réponses
+        ## même principe mais cette fois c'est avec les bonnes réponses
         for _ , (question, reponse)  in enumerate(zip(questions, reponses), start=1): 
             extraction = Reponse_SVM(
                 pertinence="OUI",
