@@ -29,7 +29,7 @@ Creative Commons Attribution-ShareAlike 4.0 International
 ### Processus de Collecte
 
 - **Description**: Les données ont été collectées à partir de plusieurs pages d'un même forum.
-- **Méthodologie**: Scraping des pages du forum car aucune mention légale n'apparaissait sur le site. J'ai donc déduit que le scraping en anonymisant les utilisateurs était autorisé.
+- **Méthodologie**: Scraping des pages du forum car aucune mention légale vis à vis du scrapping n'apparaissait sur le site. J'ai donc déduit que le scrapping, en anonymisant les utilisateurs, était autorisé.
 
 ### Informations Additionnelles
 
