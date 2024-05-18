@@ -1,2 +1,3 @@
 data/clean
 script/_pycache_
+script/.venv
