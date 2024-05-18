@@ -1,18 +1,30 @@
-"""Ce script récuppère les questions et les réponses de ce forum : 
-https://www.forumconstruire.com/construire/topic-474537-meilleur-protection-anti-rouille.php#6365329 
-et les stock dans une dataclass"""
+"""Script princial. Il récuppère les questions et les réponses du forum : 
+https://www.forumconstruire.com/construire/topic-474537-meilleur-protection-anti-rouille.php#6365329  les stock dans des dataclass
+pour enfin ecrire les différents objets des dataclass dans un fichier tsv"""
 
+import csv
+import requests
 from pathlib import Path
 from typing import List
-import requests
 from bs4 import BeautifulSoup
 from datastructures import Page, Dataset
-import csv
+
 
 
 def extraction_liens_forum(page_accueil : str | Path)-> List[str]:
-    """Extrait les différents liens d'ouverture d'une discussion que l'on retrouve sur la 
-    page principale du forum et les sauvegardes"""
+    """
+    Extrait les liens de discussions depuis une page du forum.
+
+    Cette fonction prend l'URL ou le chemin local de la page principale d'un forum, 
+    extrait tous les liens menant à des discussions en excluant les liens de spam, 
+    et les renvoie sous forme de liste.
+
+    Parametres:
+    page_accueil (str | Path): L'URL ou le chemin du fichier de la page principale du forum.
+
+    Return:
+    List[str]: Une liste de liens uniques menant aux discussions du forum.
+    """
     
     set_url = set() ## je ne sais pas pourquoi j'avais des doublons j'ai donc tout stocké dans un set
     URL = requests.get(page_accueil) 
@@ -28,8 +40,21 @@ def extraction_liens_forum(page_accueil : str | Path)-> List[str]:
 
 
 def ouverture_liens(liste_url : List[str]) -> List[BeautifulSoup]:
-    """Ouvre les différents liens des discussions du forums, prends tout leur contenu, balisage... 
-    vérifie qu'ils ont une meilleure réponse et stocke le tout dans une liste"""
+    """
+    Ouvre les différents liens des discussions du forum, récupère tout leur contenu et balisage HTML, 
+    vérifie s'ils contiennent une "meilleure réponse" et stocke le tout dans une liste.
+
+    Cette fonction prend une liste d'URLs de discussions du forum, effectue une requête HTTP pour chaque URL, 
+    analyse le contenu HTML de chaque page, vérifie la présence d'une meilleure réponse et 
+    ajoute le contenu HTML analysé à une liste si cette condition est remplie.
+
+    Parametres:
+    liste_url (List[str]): Une liste d'URLs menant aux discussions du forum.
+
+    Returns:
+    List[BeautifulSoup]: Une liste d'objets BeautifulSoup représentant le contenu HTML des pages 
+                         contenant la meilleure réponse.
+    """
 
     liste_soup = []
     for lien in liste_url:
@@ -45,34 +70,77 @@ def ouverture_liens(liste_url : List[str]) -> List[BeautifulSoup]:
         
 
 def recuperation_question(soup_liste : List[BeautifulSoup]) -> List[str]:
-    """Récupération et prétraitement des questions"""
+    """
+    Récupère et prétraite les questions à partir d'une liste de contenus HTML.
+
+    Cette fonction parcourt une liste d'objets BeautifulSoup ( le contenu HTML des pages 
+    de discussions du forum), extrait le texte des blocs de première question et retourne une liste 
+    de ces questions sous forme de chaînes de caractères.
+
+    Parametres:
+    soup_liste (List[BeautifulSoup]): Une liste d'objets BeautifulSoup représentant les contenus HTML 
+                                      des pages de discussions du forum.
+
+    Returns:
+    List[str]: Une liste de chaînes de caractères, chaque chaîne représentant une question extraite 
+               d'une page de discussion.
+    """
     
     liste_question = []
     for numero,soup in enumerate(soup_liste):
         premier_message_bloc = soup.find("div", class_="first_message_bloc")
-        if premier_message_bloc: ##des fois il peut ne pas y avoir de question
+        if premier_message_bloc: ##des fois il peut ne pas y avoir de question si c'est le cas alors on ne prend pas en compte cette question
             question = premier_message_bloc.get_text(separator=" ", strip=True)
             # print(f"question numéro {numero }: {question}")
             liste_question.append(question)
     return liste_question
 
 def recuperation_sujet_question(soup_list: List[BeautifulSoup]) -> List[str]:
-    """Récuppération du sujet de la question"""
+    ## Cette fonction est quasi identique à celle de la récupération des questions j'aurais pu tout unifier dans une fonction
+    """
+    Récupère les sujets des questions.
 
-    liste_sujet = []
+    Cette fonction parcourt une liste d'objets BeautifulSoup et extrait le texte 
+    des sujets des questions et retourne une liste de ces sujets sous forme de chaînes 
+    de caractères, en évitant les doublons.
+
+    Parametres:
+    soup_list (List[BeautifulSoup]): Une liste d'objets BeautifulSoup représentant les contenus HTML 
+                                     des pages de discussions du forum.
+
+    Returns:
+    List[str]: Une liste de chaînes de caractères, chaque chaîne représentant un sujet de question 
+               extrait d'une page de discussion, sans doublons.
+    """
+    
+    sujets = set()  ## j'utilise encore un set pour éviter les doublons
     for soup in soup_list:
         div_tag = soup.find('div', class_='ultra_padding_iphone')
-        
         if div_tag:
             a_tag = div_tag.find('a')
             if a_tag:
                 sujet = a_tag.get_text(strip=True)
-                liste_sujet.append(sujet)
-    return liste_sujet
+                sujets.add(sujet)  
+        conversion_liste = list(sujets)  ## je convertis notre set en liste puisque cela nous permettra de zip toutes les listes pour pouvoir les parcourir dans le main
+    return conversion_liste
+
 
 
 def sauvegardes_questions(chemin_fichier : str | Path, liste_question : List[str]) -> None:
-    """sauvegardes des questions"""
+    ## cette fonction est une vérification, elle n'est pas utilisée dans le main, cela permettait de voir si les questions étaient bien extraites et sans doublons
+    """
+    Sauvegarde les questions dans un fichier texte.
+
+    Cette fonction écrit chaque question de la liste fournie dans un fichier texte spécifié. 
+    Chaque question est précédée de son numéro de ligne.
+
+    Parametres:
+    chemin_fichier (str | Path): Le chemin du fichier où les questions seront sauvegardées.
+    liste_question (List[str]): Une liste de chaînes de caractères, chaque chaîne représentant une question.
+
+    Returns:
+    None
+    """
 
     with open(chemin_fichier, "w", encoding='UTF8') as resultat:
         for numero,question in enumerate(liste_question):
@@ -80,7 +148,19 @@ def sauvegardes_questions(chemin_fichier : str | Path, liste_question : List[str
 
 
 def url_meilleurs_reponse(liste_url : List[str]) -> List[str]:
-    """Récupération de l'URL de la meilleure réponse et ajout dans une liste"""
+    """
+    Récupère l'URL de la meilleure réponse à partir d'une liste d'URLs et les ajoute dans une liste.
+
+    Cette fonction parcourt une liste d'URLs de discussions du forum, effectue une requête HTTP 
+    pour chaque URL, analyse le contenu HTML de chaque page, extrait l'URL de la meilleure réponse 
+    si elle existe, et les ajoute à une liste. Cette liste est ensuite retournée.
+
+    Parametres:
+    liste_url (List[str]): Une liste d'URLs menant aux discussions du forum.
+
+    Returns:
+    List[str]: Une liste d'URLs menant aux meilleures réponses des discussions du forum.
+    """
     
     url_meilleurs_reponse = []
     # print(len(liste_url))
@@ -103,7 +183,19 @@ def url_meilleurs_reponse(liste_url : List[str]) -> List[str]:
 
 
 def recuperation_meilleure_reponse(liste_URL_reponse : List[str]):
-    """Parcours l'URL où se trouve la meilleure réponse et récuppère la réponse avec le plus de likes"""
+    """
+    Parcourt les URLs des réponses et récupère la réponse avec le plus de likes.
+
+    Cette fonction parcourt une liste d'URLs, analyse le contenu HTML de chaque page pour trouver 
+    les likes de chaque réponse, puis récupère la réponse avec le plus de likes. 
+    Elle renvoie une liste contenant la meilleure réponse de chaque URL.
+
+    Parametres:
+    liste_URL_reponse (List[str]): Une liste d'URLs menant aux réponses du forum.
+
+    Returns:
+    List[str]: Une liste contenant la meilleure réponse de chaque URL.
+    """
     
     comments_likes = []
     liste_meilleure_reponse = []
@@ -134,7 +226,20 @@ def recuperation_meilleure_reponse(liste_URL_reponse : List[str]):
 
 
 def ecriture_resultat_tsv(dataset_fichier : str | Path, data : Dataset) -> None:
-    """Cette fonction écrit nos résultat dans un fichier TSV"""
+    """
+    Écrit les résultats dans un fichier TSV.
+
+    Cette fonction prend en entrée un chemin de fichier et un objet Dataset. 
+    Elle écrit ces données dans un fichier TSV avec les colonnes suivantes : ID, URL, 
+    Question_ID, Reponse_ID, Sujet, Question, Reponse, Etiquette.
+
+    Parametres:
+    dataset_fichier (str |Path): Le chemin du fichier où les résultats seront écrits.
+    data (Dataset): Un objet Dataset contenant les données à écrire dans le fichier.
+
+    Returns:
+    None
+    """
 
     with open(dataset_fichier, "w", newline='', encoding='UTF-8') as resultats_tsv:
         ecriture = csv.writer(resultats_tsv, delimiter="\t")
@@ -165,7 +270,7 @@ def main():
     
     ##parcours de tous nos résultats zippés et ajout dans notre dataclass
     for i, (url, question, reponse, sujet) in enumerate(zip(resultats_extraction, questions, reponses, sujets), start=1):
-        alors = Page(
+        extraction = Page(
             id=i,
             lien=url,
             id_question=i,
@@ -173,17 +278,22 @@ def main():
             sujet=sujet,
             question=question,
             reponse=reponse,
-            etiquette="HUMAIN"
+            etiquette="HUMAIN" ## car i; s'agit de réponses humaines
         )
-        liste.append(alors)
-
-    dataset = Dataset(data=liste)
+        liste.append(extraction)
     
+    dataset = Dataset(data=liste) ## création d'un objet Dataset contenant nos données extraites 
     
     # for page in dataset.data:
     #     print(page)
 
-    ecriture_resultat_tsv('../data/dataset/dataset.tsv', dataset)
+    with open('../data/corpus/', "w") as fichier:
+        fichier = dataset.data
+        for page in fichier:
+            fichier.write(page)
+
+    ecriture_resultat_tsv('../data/dataset/test.tsv', dataset)
+
 
 
 if __name__ == "__main__":
